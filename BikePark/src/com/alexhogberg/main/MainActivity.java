@@ -5,14 +5,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.alexhogberg.android.R;
 
@@ -31,6 +27,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
+	
+	private static final int ARRIVED_RANGE = 4;
 
 	private LocationManager mlocManager;
 	private LocationListener mlocListener;
@@ -52,10 +50,14 @@ public class MainActivity extends Activity {
 		HashMap<String, Object> prefs = getSavedPrefs();
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		//Load the current GoogleMap from the fragment
 		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
 				.getMap();
 		mMap.setIndoorEnabled(true);
 		mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+		
+		//Connect to the GPS service
 		mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		mlocListener = new MyLocationListener();
 		mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
@@ -101,14 +103,7 @@ public class MainActivity extends Activity {
 		findButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (currentMarker != null)
-					putPositionMarker(true);
-				else {
-					Toast.makeText(getApplicationContext(),
-							"You have no previous parkings!",
-							Toast.LENGTH_SHORT).show();
-				}
-
+				putPositionMarker(true);
 			}
 		});
 
@@ -139,37 +134,35 @@ public class MainActivity extends Activity {
 			Location loc = mlocManager
 					.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 			if (loc != null) {
-				mMap = ((MapFragment) getFragmentManager().findFragmentById(
-						R.id.map)).getMap();
+				
 				// Add a marker for the users current position
-				currentPosition = mMap.addMarker(new MarkerOptions()
-						.position(new LatLng(loc.getLatitude(), loc
-								.getLongitude())));
-				currentPosition.setIcon(BitmapDescriptorFactory
-						.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+				LatLng pos = new LatLng(loc.getLatitude(), loc.getLongitude());
+				String prefix = "You are here! (";
+				double distance = mH.getDistance(currentMarker.getPosition(),pos);
+				String suffix = " m away)";
+				String title = prefix + "" + distance + "" + suffix;
+				
+				currentPosition = mMap.addMarker(mH.createMarker(pos, title, "red"));
+				
+				//The user has "arrived" when they are less than ARRIVED_RANGE from the target
 				if (mH.getDistance(currentPosition.getPosition(),
-						currentMarker.getPosition()) > 4) {
-					currentPosition
-							.setTitle(("You are here! ("
-									+ mH.getDistance(
-											currentMarker.getPosition(),
-											currentPosition.getPosition()) + " m away)"));
-				} else {
+						currentMarker.getPosition()) < ARRIVED_RANGE) {
 					currentPosition.setTitle("You have arrived!");
 				}
+				
 				// Draw a line between the two locations
 				mapLine = mH.DrawLine(mMap, currentMarker,
 						currentPosition.getPosition());
 				if (zoomTo != false) {
-					CameraUpdate center = CameraUpdateFactory
-							.newLatLng(currentPosition.getPosition());
-					CameraUpdate zoom = CameraUpdateFactory.zoomTo(18);
-					mMap.moveCamera(center);
-					mMap.animateCamera(zoom);
+					mH.zoomTo(mMap, currentPosition);
 
 				}
 				currentPosition.showInfoWindow();
 			}
+		} else {
+			Toast.makeText(getApplicationContext(),
+					"You have no previous parkings!",
+					Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -184,21 +177,25 @@ public class MainActivity extends Activity {
 	 *            the current date
 	 */
 	private void setMarker(double lat, double lon, String d) {
-		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
-				.getMap();
 		mMap.clear();
 		if (currentPosition != null)
 			currentPosition = null;
 		LatLng currPos = new LatLng(lat, lon);
-		currentMarker = mMap.addMarker(new MarkerOptions().position(currPos)
-				.title("Last parking: " + d.toString()));
-		CameraUpdate center = CameraUpdateFactory.newLatLng(currPos);
-		CameraUpdate zoom = CameraUpdateFactory.zoomTo(18);
-		currentMarker.setIcon(BitmapDescriptorFactory
-				.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+		String title = "Last parking: " + d;
+		currentMarker = mMap.addMarker(mH.createMarker(currPos, title, "green"));
 		currentMarker.showInfoWindow();
-		mMap.moveCamera(center);
-		mMap.animateCamera(zoom);
+		mH.zoomTo(mMap, currentMarker);
+	}
+	
+	
+	
+	/**
+	 * Clear the map and remove any saved preferences
+	 */
+	protected void clearMap() {
+		mMap.clear();
+		currentMarker = null;
+		removeSavedPrefs();
 	}
 
 	/**
@@ -284,11 +281,7 @@ public class MainActivity extends Activity {
 						new DialogInterface.OnClickListener() {
 							public void onClick(final DialogInterface dialog,
 									final int id) {
-								mMap = ((MapFragment) getFragmentManager()
-										.findFragmentById(R.id.map)).getMap();
-								mMap.clear();
-								currentMarker = null;
-								removeSavedPrefs();
+								clearMap();
 							}
 						})
 				.setNegativeButton("No", new DialogInterface.OnClickListener() {

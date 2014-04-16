@@ -2,13 +2,19 @@ package com.alexhogberg.main;
 
 import android.graphics.Color;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 public class MapHelper {
+	
+	private static final int ZOOM_LEVEL = 18;
 
 	public MapHelper() {
 	}
@@ -53,7 +59,28 @@ public class MapHelper {
 		            ).width(5).color(Color.RED);
 		mapLine = map.addPolyline(line);
 		return mapLine;
+	}
+	
+	public void zoomTo(GoogleMap map, Marker position) {
+		CameraUpdate center = CameraUpdateFactory.newLatLng(position.getPosition());
+		CameraUpdate zoom = CameraUpdateFactory.zoomTo(ZOOM_LEVEL);
 		
+		map.moveCamera(center);
+		map.animateCamera(zoom);
+	}
+	
+	public MarkerOptions createMarker(LatLng position, String title, String color) {
+		MarkerOptions newMarkerOptions = new MarkerOptions();
+		newMarkerOptions.position(position);
+		
+		
+		newMarkerOptions.title(title);
+		if(color.equals("green"))
+			newMarkerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+		if(color.equals("red"))
+			newMarkerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+		
+		return newMarkerOptions;
 	}
 
 }
