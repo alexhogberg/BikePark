@@ -18,6 +18,11 @@ public class MapHelper {
 
 	public MapHelper() {
 	}
+	
+	public void generateMapOptions(GoogleMap map) {
+		map.setIndoorEnabled(true);
+		map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+	}
 
 	/**
 	 * Mathematical function to calculate the distance between two points in a coordinate
@@ -50,12 +55,12 @@ public class MapHelper {
 	 * @param lat latitude
 	 * @param lat longitude
 	 */
-	public Polyline DrawLine(GoogleMap map, Marker currentMarker, LatLng end) {
+	public Polyline DrawLine(GoogleMap map, Marker start, Marker stop) {
 		Polyline mapLine;
 		PolylineOptions line =
 				new PolylineOptions().add(
-					currentMarker.getPosition(),
-		            end
+					start.getPosition(),
+		            stop.getPosition()
 		            ).width(5).color(Color.RED);
 		mapLine = map.addPolyline(line);
 		return mapLine;

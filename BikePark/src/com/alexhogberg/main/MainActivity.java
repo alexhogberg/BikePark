@@ -11,6 +11,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.alexhogberg.android.R;
+import com.alexhogberg.gps.MyLocationListener;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -27,11 +28,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
-	
-	private static final int ARRIVED_RANGE = 4;
+
 
 	private LocationManager mlocManager;
-	private LocationListener mlocListener;
+	private MyLocationListener mlocListener;
 	private GoogleMap mMap;
 	private Button parkButton;
 	private Button findButton;
@@ -54,12 +54,11 @@ public class MainActivity extends Activity {
 		//Load the current GoogleMap from the fragment
 		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
 				.getMap();
-		mMap.setIndoorEnabled(true);
-		mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+		mH.generateMapOptions(mMap);
 		
 		//Connect to the GPS service
 		mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		mlocListener = new MyLocationListener();
+		mlocListener = new MyLocationListener(mMap, currentPosition, currentMarker, this);
 		mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
 				mlocListener);
 
@@ -103,7 +102,7 @@ public class MainActivity extends Activity {
 		findButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				putPositionMarker(true);
+				putPositionMarker();
 			}
 		});
 
@@ -124,7 +123,7 @@ public class MainActivity extends Activity {
 	 * @param zoomTo
 	 *            whether to zoom to the current location or not.
 	 */
-	private void putPositionMarker(boolean zoomTo) {
+	private void putPositionMarker() {
 		if (currentPosition != null)
 			currentPosition.remove();
 		if (mapLine != null)
@@ -142,22 +141,9 @@ public class MainActivity extends Activity {
 				String suffix = " m away)";
 				String title = prefix + "" + distance + "" + suffix;
 				
-				currentPosition = mMap.addMarker(mH.createMarker(pos, title, "red"));
+				mlocListener.setCurrentPosition(mMap.addMarker(mH.createMarker(pos, title, "red")));
 				
-				//The user has "arrived" when they are less than ARRIVED_RANGE from the target
-				if (mH.getDistance(currentPosition.getPosition(),
-						currentMarker.getPosition()) < ARRIVED_RANGE) {
-					currentPosition.setTitle("You have arrived!");
-				}
-				
-				// Draw a line between the two locations
-				mapLine = mH.DrawLine(mMap, currentMarker,
-						currentPosition.getPosition());
-				if (zoomTo != false) {
-					mH.zoomTo(mMap, currentPosition);
-
-				}
-				currentPosition.showInfoWindow();
+				mH.zoomTo(mMap, mlocListener.getCurrentPosition());
 			}
 		} else {
 			Toast.makeText(getApplicationContext(),
@@ -183,6 +169,7 @@ public class MainActivity extends Activity {
 		LatLng currPos = new LatLng(lat, lon);
 		String title = "Last parking: " + d;
 		currentMarker = mMap.addMarker(mH.createMarker(currPos, title, "green"));
+		mlocListener.setCurrentTarget(currentMarker);
 		currentMarker.showInfoWindow();
 		mH.zoomTo(mMap, currentMarker);
 	}
@@ -195,6 +182,8 @@ public class MainActivity extends Activity {
 	protected void clearMap() {
 		mMap.clear();
 		currentMarker = null;
+		mlocListener.setCurrentTarget(null);
+		mlocListener.setCurrentPosition(null);
 		removeSavedPrefs();
 	}
 
@@ -294,38 +283,5 @@ public class MainActivity extends Activity {
 		alert.show();
 	}
 
-	/**
-	 * A class that listens to GPS location changes and acts accordingly
-	 * 
-	 * @author Alexander
-	 * 
-	 */
-	public class MyLocationListener implements LocationListener {
-		@Override
-		public void onLocationChanged(Location loc) {
-			if (currentPosition != null && currentMarker != null) {
-				if (currentPosition.getPosition().latitude != loc.getLatitude()
-						&& currentPosition.getPosition().longitude != loc
-								.getLongitude()) {
-					putPositionMarker(false);
-				}
-			}
-		}
 
-		@Override
-		public void onProviderDisabled(String provider) {
-			Toast.makeText(getApplicationContext(), "Gps Disabled",
-					Toast.LENGTH_SHORT).show();
-		}
-
-		@Override
-		public void onProviderEnabled(String provider) {
-			Toast.makeText(getApplicationContext(), "Gps Enabled",
-					Toast.LENGTH_SHORT).show();
-		}
-
-		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-		}
-	}
 }
