@@ -15,7 +15,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.hmkcode.android.R;
+import com.alexhogberg.android.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
