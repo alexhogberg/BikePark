@@ -1,4 +1,4 @@
-package com.hmkcode.android_google_map_v2;
+package com.alexhogberg.main;
 
 import android.graphics.Color;
 
