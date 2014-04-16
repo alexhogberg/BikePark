@@ -1,0 +1,66 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout1"
+    style="@style/AppTheme"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fadingEdge="horizontal|none"
+    android:fadingEdgeLength="@dimen/activity_horizontal_margin"
+    android:orientation="vertical"
+    android:paddingBottom="5dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    tools:context=".MainActivity" >
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.MapFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="0dip"
+            android:layout_gravity="fill"
+            android:layout_weight="0.60" />
+        
+        <LinearLayout
+            android:id="@+id/buttonArea"
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom|right"
+            android:divider="?android:attr/listDivider"
+            android:dividerPadding="12dp"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:paddingTop="10dp" >
+
+            <Button
+                android:id="@+id/park"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/marker"
+                android:text="@string/park" />
+            
+		    <Button
+		        android:id="@+id/find"
+		        style="?android:attr/buttonBarButtonStyle"
+		        android:layout_width="0dp"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:drawableTop="@drawable/compass"
+		        android:text="@string/find" />
+		    
+		    <Button
+		        android:id="@+id/reset"
+		        style="?android:attr/buttonBarButtonStyle"
+		        android:layout_width="0dp"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:drawableTop="@drawable/delete"
+		        android:text="@string/reset" />
+
+		</LinearLayout>
+    </LinearLayout>
