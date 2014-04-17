@@ -18,7 +18,7 @@ import android.widget.Toast;
  * @author Alexander
  * 
  */
-public class MyLocationListener implements LocationListener {
+public class GPSListener implements LocationListener {
 	
 	private static final int ARRIVED_RANGE = 4;
 	
@@ -31,7 +31,7 @@ public class MyLocationListener implements LocationListener {
 	/**
 	 * Updates the users position
 	 */
-	public MyLocationListener(GoogleMap googleMap, Marker currentPosition, Marker currentMarker, Context c) {
+	public GPSListener(GoogleMap googleMap, Marker currentPosition, Marker currentMarker, Context c) {
 		target = currentMarker;
 		position = currentPosition;
 		context = c;

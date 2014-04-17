@@ -1,9 +1,7 @@
 package com.alexhogberg.main;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -12,7 +10,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.alexhogberg.android.R;
-import com.alexhogberg.gps.MyLocationListener;
+import com.alexhogberg.gps.GPSListener;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,7 +19,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
@@ -30,9 +27,8 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-
 	private LocationManager mlocManager;
-	private MyLocationListener mlocListener;
+	private GPSListener mlocListener;
 	private GoogleMap mMap;
 	private Button parkButton;
 	private Button findButton;
@@ -59,7 +55,7 @@ public class MainActivity extends Activity {
 		
 		//Connect to the GPS service
 		mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		mlocListener = new MyLocationListener(mMap, currentPositionMarker, currentTargetMarker, this);
+		mlocListener = new GPSListener(mMap, currentPositionMarker, currentTargetMarker, this);
 		mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
 				mlocListener);
 		
