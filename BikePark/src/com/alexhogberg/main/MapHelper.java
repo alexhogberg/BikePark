@@ -1,5 +1,9 @@
 package com.alexhogberg.main;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import android.graphics.Color;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -15,13 +19,17 @@ import com.google.android.gms.maps.model.PolylineOptions;
 public class MapHelper {
 	
 	private static final int ZOOM_LEVEL = 18;
+	private GoogleMap currentMap;
+	private SimpleDateFormat dateFormat = new SimpleDateFormat(
+			"EEEE, LLLL M y H:m:s", Locale.ENGLISH);
 
-	public MapHelper() {
+	public MapHelper(GoogleMap map) {
+		currentMap = map;
 	}
 	
-	public void generateMapOptions(GoogleMap map) {
-		map.setIndoorEnabled(true);
-		map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+	public void generateMapOptions() {
+		currentMap.setIndoorEnabled(true);
+		currentMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 	}
 
 	/**
@@ -55,37 +63,64 @@ public class MapHelper {
 	 * @param lat latitude
 	 * @param lat longitude
 	 */
-	public Polyline DrawLine(GoogleMap map, Marker start, Marker stop) {
+	public Polyline DrawLine(Marker start, Marker stop) {
 		Polyline mapLine;
 		PolylineOptions line =
 				new PolylineOptions().add(
 					start.getPosition(),
 		            stop.getPosition()
 		            ).width(5).color(Color.RED);
-		mapLine = map.addPolyline(line);
+		mapLine = currentMap.addPolyline(line);
 		return mapLine;
 	}
 	
-	public void zoomTo(GoogleMap map, Marker position) {
+	/**
+	 * Zooms the map to a given position
+	 * @param position
+	 */
+	public void zoomTo(Marker position) {
 		CameraUpdate center = CameraUpdateFactory.newLatLng(position.getPosition());
 		CameraUpdate zoom = CameraUpdateFactory.zoomTo(ZOOM_LEVEL);
 		
-		map.moveCamera(center);
-		map.animateCamera(zoom);
+		currentMap.moveCamera(center);
+		currentMap.animateCamera(zoom);
 	}
 	
-	public MarkerOptions createMarker(LatLng position, String title, String color) {
-		MarkerOptions newMarkerOptions = new MarkerOptions();
-		newMarkerOptions.position(position);
+	/**
+	 * Create a new target marker
+	 * @param position current position
+	 * @param title the given title
+	 * @return a MarkerOptions object
+	 */
+	public MarkerOptions createTargetMarker(LatLng position, String title) {
+		MarkerOptions mO = new MarkerOptions();
+		mO.position(position);
+		if(title == null) {
+			Date d = new Date();
+			String formattedDate = dateFormat.format(d);
+			mO.title("Last parking: " + formattedDate);
+		} else {
+			mO.title(title);
+		}
 		
+		mO.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
 		
-		newMarkerOptions.title(title);
-		if(color.equals("green"))
-			newMarkerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-		if(color.equals("red"))
-			newMarkerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+		return mO;
+	}
+	
+	public MarkerOptions createPositionMarker(LatLng position, Marker target) {
+		MarkerOptions mO = new MarkerOptions();
+		mO.position(position);
 		
-		return newMarkerOptions;
+		String prefix = "You are here! (";
+		double distance = getDistance(target.getPosition(),position);
+		String suffix = " m away)";
+		String title = prefix + "" + distance + "" + suffix;
+		
+		mO.title(title);
+		mO.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+		
+		return mO;
 	}
 
 }

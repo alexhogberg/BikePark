@@ -27,7 +27,7 @@ public class MyLocationListener implements LocationListener {
 	private GoogleMap map;
 	private Polyline mapLine;
 	private Context context;
-	private MapHelper mH = new MapHelper();
+	private MapHelper mH;
 	/**
 	 * Updates the users position
 	 */
@@ -36,6 +36,7 @@ public class MyLocationListener implements LocationListener {
 		position = currentPosition;
 		context = c;
 		map = googleMap;
+		mH = new MapHelper(map);
 	}
 	
 	public void setCurrentTarget(Marker target) {
@@ -70,7 +71,7 @@ public class MyLocationListener implements LocationListener {
 					position.setTitle("You have arrived!");
 				
 				
-				mapLine = mH.DrawLine(map, target, position);
+				mapLine = mH.DrawLine(target, position);
 				position.showInfoWindow();
 				if (mH.getDistance(target.getPosition(),
 						position.getPosition()) < ARRIVED_RANGE) {

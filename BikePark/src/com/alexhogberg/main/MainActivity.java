@@ -9,6 +9,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.alexhogberg.android.R;
 import com.alexhogberg.gps.MyLocationListener;
@@ -36,41 +37,40 @@ public class MainActivity extends Activity {
 	private Button parkButton;
 	private Button findButton;
 	private Button resetButton;
-	private Marker currentMarker;
-	private Marker currentPosition;
+	private Marker currentTargetMarker;
+	private Marker currentPositionMarker;
 	private Polyline mapLine;
-	private MapHelper mH = new MapHelper();
-	private SimpleDateFormat format = new SimpleDateFormat(
-			"EEEE, LLLL M y H:m:s", Locale.ENGLISH);
+	private MapHelper mH;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// If the user has closed the app with a present parking, load these
-		// settings
-		HashMap<String, Object> prefs = getSavedPrefs();
+	
+		//Load the view
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
 		//Load the current GoogleMap from the fragment
 		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
 				.getMap();
-		mH.generateMapOptions(mMap);
+		
+		//Start a new MapHelper class attached with the current map to deal with the interaction
+		mH = new MapHelper(mMap);
+		mH.generateMapOptions();
 		
 		//Connect to the GPS service
 		mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		mlocListener = new MyLocationListener(mMap, currentPosition, currentMarker, this);
+		mlocListener = new MyLocationListener(mMap, currentPositionMarker, currentTargetMarker, this);
 		mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
 				mlocListener);
-
+		
+		// If the user has closed the app with a present parking, load these
+		// settings
+		loadSettings();
+		
+		
 		// If GPS is disabled, send warning
 		if (!mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			buildAlertMessageNoGps();
-		}
-
-		// Load the previous settings if they exist and add a marker
-		if ((double) prefs.get("lat") != 0 && (double) prefs.get("lon") != 0) {
-			setMarker((double) prefs.get("lat"), (double) prefs.get("lon"),
-					new Date((long) prefs.get("date")).toString());
 		}
 
 		// Puts a marker on the map where the user is currently located (via
@@ -79,20 +79,7 @@ public class MainActivity extends Activity {
 		parkButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Location loc = mlocManager
-						.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-				if (loc != null) {
-					Date d = new Date();
-					String date = format.format(d);
-
-					setMarker(loc.getLatitude(), loc.getLongitude(), date);
-					setSavedPrefs(loc.getLatitude(), loc.getLongitude(),
-							d.getTime());
-				} else {
-					Toast.makeText(getApplicationContext(),
-							"Please make sure that the GPS is enabled.",
-							Toast.LENGTH_SHORT).show();
-				}
+				setMarkerFromPosition();
 			}
 		});
 
@@ -116,6 +103,16 @@ public class MainActivity extends Activity {
 		});
 	}
 
+	private void loadSettings() {
+		HashMap<String, Object> prefs = getSavedPrefs();
+		// Load the previous settings if they exist and add a marker
+		if ((double) prefs.get("lat") != 0 && (double) prefs.get("lon") != 0) {
+			setMarkerWithValues((double) prefs.get("lat"), (double) prefs.get("lon"),
+					new Date((long) prefs.get("date")).toString());
+		}
+		
+	}
+
 	/**
 	 * Creates a marker where the user is located and maps it towards the parked
 	 * position
@@ -124,26 +121,26 @@ public class MainActivity extends Activity {
 	 *            whether to zoom to the current location or not.
 	 */
 	private void putPositionMarker() {
-		if (currentPosition != null)
-			currentPosition.remove();
+		if (currentPositionMarker != null)
+			currentPositionMarker.remove();
 		if (mapLine != null)
 			mapLine.remove();
 
-		if (currentMarker != null) {
+		if (currentTargetMarker != null) {
 			Location loc = mlocManager
 					.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 			if (loc != null) {
 				
 				// Add a marker for the users current position
 				LatLng pos = new LatLng(loc.getLatitude(), loc.getLongitude());
-				String prefix = "You are here! (";
-				double distance = mH.getDistance(currentMarker.getPosition(),pos);
-				String suffix = " m away)";
-				String title = prefix + "" + distance + "" + suffix;
 				
-				mlocListener.setCurrentPosition(mMap.addMarker(mH.createMarker(pos, title, "red")));
+				//Notify the listener of the new marker
+				MarkerOptions markerOptions = mH.createPositionMarker(pos, currentTargetMarker);
+				Marker newMarker = mMap.addMarker(markerOptions);
 				
-				mH.zoomTo(mMap, mlocListener.getCurrentPosition());
+				mlocListener.setCurrentPosition(newMarker);
+				
+				mH.zoomTo(mlocListener.getCurrentPosition());
 			}
 		} else {
 			Toast.makeText(getApplicationContext(),
@@ -152,6 +149,32 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	/**
+	 * Set a marker at the given GPS coordinates
+	 */
+	private void setMarkerFromPosition() {
+		Location loc = mlocManager
+				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		if (loc != null) {
+			
+			mMap.clear();
+			if (currentPositionMarker != null)
+				currentPositionMarker = null;
+			LatLng currPos = new LatLng(loc.getLatitude(), loc.getLongitude());
+			currentTargetMarker = mMap.addMarker(mH.createTargetMarker(currPos, null));
+			
+			//Send the current marker to the listener
+			mlocListener.setCurrentTarget(currentTargetMarker);
+			currentTargetMarker.showInfoWindow();
+			mH.zoomTo(currentTargetMarker);
+			setSavedPrefs(loc.getLatitude(), loc.getLongitude());
+		} else {
+			Toast.makeText(getApplicationContext(),
+					"Please make sure that the GPS is enabled.",
+					Toast.LENGTH_SHORT).show();
+		}
+	}
+	
 	/**
 	 * Sets a marker at a given latitude and longitude
 	 * 
@@ -162,26 +185,23 @@ public class MainActivity extends Activity {
 	 * @param d
 	 *            the current date
 	 */
-	private void setMarker(double lat, double lon, String d) {
+	private void setMarkerWithValues(double lat, double lon, String date) {
 		mMap.clear();
-		if (currentPosition != null)
-			currentPosition = null;
+		if (currentPositionMarker != null)
+			currentPositionMarker = null;
 		LatLng currPos = new LatLng(lat, lon);
-		String title = "Last parking: " + d;
-		currentMarker = mMap.addMarker(mH.createMarker(currPos, title, "green"));
-		mlocListener.setCurrentTarget(currentMarker);
-		currentMarker.showInfoWindow();
-		mH.zoomTo(mMap, currentMarker);
+		String title = "Last parking: " + date;
+		currentTargetMarker = mMap.addMarker(mH.createTargetMarker(currPos, title));
+		mlocListener.setCurrentTarget(currentTargetMarker);
+		currentTargetMarker.showInfoWindow();
+		mH.zoomTo(currentTargetMarker);
 	}
-	
-	
-	
 	/**
 	 * Clear the map and remove any saved preferences
 	 */
 	protected void clearMap() {
 		mMap.clear();
-		currentMarker = null;
+		currentTargetMarker = null;
 		mlocListener.setCurrentTarget(null);
 		mlocListener.setCurrentPosition(null);
 		removeSavedPrefs();
@@ -214,12 +234,13 @@ public class MainActivity extends Activity {
 	 * @param date
 	 *            the date to save
 	 */
-	private void setSavedPrefs(double lat, double lon, long date) {
+	private void setSavedPrefs(double lat, double lon) {
+		Date d = new Date();
 		SharedPreferences settings = getSharedPreferences("POSITIONS", 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putLong("latitude", Double.doubleToLongBits(lat));
 		editor.putLong("longitude", Double.doubleToLongBits(lon));
-		editor.putLong("date", date);
+		editor.putLong("date", d.getTime());
 
 		// Commit the edits!
 		editor.commit();
