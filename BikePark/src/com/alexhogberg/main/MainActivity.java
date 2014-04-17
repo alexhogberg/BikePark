@@ -11,6 +11,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.alexhogberg.android.R;
 import com.alexhogberg.gps.GPSListener;
+import com.alexhogberg.map.MapHelper;
 
 import android.app.Activity;
 import android.app.AlertDialog;

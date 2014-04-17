@@ -1,5 +1,5 @@
 package com.alexhogberg.gps;
-import com.alexhogberg.main.MapHelper;
+import com.alexhogberg.map.MapHelper;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;

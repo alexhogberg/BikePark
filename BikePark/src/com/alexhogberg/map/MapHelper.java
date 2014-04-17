@@ -1,4 +1,4 @@
-package com.alexhogberg.main;
+package com.alexhogberg.map;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
