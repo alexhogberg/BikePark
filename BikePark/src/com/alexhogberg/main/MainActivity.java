@@ -76,7 +76,7 @@ public class MainActivity extends Activity {
 		parkButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				setMarkerFromPosition();
+				buildQuestionAutoOrManual();
 			}
 		});
 
@@ -193,6 +193,23 @@ public class MainActivity extends Activity {
 		currentTargetMarker.showInfoWindow();
 		mH.zoomTo(currentTargetMarker);
 	}
+	
+	private void setManualTargetMarker(LatLng point) {
+		mMap.clear();
+		if (currentPositionMarker != null)
+			currentPositionMarker = null;
+		
+        LatLng position = point;
+        currentTargetMarker = mMap.addMarker(mH.createTargetMarker(position, null));
+		
+		//Send the current marker to the listener
+		mlocListener.setCurrentTarget(currentTargetMarker);
+		currentTargetMarker.showInfoWindow();
+		mH.zoomTo(currentTargetMarker);
+		setSavedPrefs(position.latitude, position.longitude);
+
+		mMap.setOnMapClickListener(null);
+	}
 	/**
 	 * Clear the map and remove any saved preferences
 	 */
@@ -294,9 +311,38 @@ public class MainActivity extends Activity {
 				.setNegativeButton("No", new DialogInterface.OnClickListener() {
 					public void onClick(final DialogInterface dialog,
 							final int id) {
-
+								
 					}
 				});
+		final AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
+	private void buildQuestionAutoOrManual() {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Please select the method to use")
+				.setCancelable(true)
+				.setPositiveButton("Automatically (GPS)",
+						new DialogInterface.OnClickListener() {
+							public void onClick(final DialogInterface dialog,
+									final int id) {
+								setMarkerFromPosition();
+							}
+						})
+				.setNegativeButton("Manual", 
+						new DialogInterface.OnClickListener() {
+							public void onClick(final DialogInterface dialog,
+									final int id) {
+								mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
+							        @Override
+							        public void onMapClick(LatLng point) {
+							        	setManualTargetMarker(point);
+							        }
+							    });
+								
+							}
+						});
 		final AlertDialog alert = builder.create();
 		alert.show();
 	}
