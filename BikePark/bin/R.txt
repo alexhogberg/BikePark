@@ -59,7 +59,8 @@ int drawable ic_plusone_medium_off_client 0x7f02001a
 int drawable ic_plusone_small_off_client 0x7f02001b
 int drawable ic_plusone_standard_off_client 0x7f02001c
 int drawable ic_plusone_tall_off_client 0x7f02001d
-int drawable marker 0x7f02001e
+int drawable icon 0x7f02001e
+int drawable marker 0x7f02001f
 int id action_settings 0x7f05000d
 int id adLayout 0x7f050006
 int id buttonArea 0x7f050009
