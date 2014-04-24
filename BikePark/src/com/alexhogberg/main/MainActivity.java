@@ -49,6 +49,7 @@ public class MainActivity extends Activity {
 		//Load the current GoogleMap from the fragment
 		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
 				.getMap();
+		System.out.println(mMap.toString());
 		
 		//Start a new MapHelper class attached with the current map to deal with the interaction
 		mH = new MapHelper(mMap);

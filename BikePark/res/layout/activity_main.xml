@@ -11,56 +11,78 @@
     android:paddingLeft="0dp"
     android:paddingRight="0dp"
     android:paddingTop="0dp"
-    tools:context=".MainActivity" >
+    tools:context=".MainActivity" xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <fragment
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.MapFragment"
+    
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="460dp"
+        android:orientation="vertical" >
+
+        <com.google.android.gms.ads.AdView
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/adView"
             android:layout_width="wrap_content"
-            android:layout_height="0dip"
-            android:layout_gravity="fill"
-            android:layout_weight="0.60" />
-        
-        <LinearLayout
-            android:id="@+id/buttonArea"
-            style="?android:attr/buttonBarStyle"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="bottom|right"
-            android:divider="?android:attr/listDivider"
-            android:dividerPadding="12dp"
-            android:orientation="horizontal"
-            android:paddingBottom="0dp"
-            android:paddingLeft="0dp"
-            android:paddingRight="0dp"
-            android:paddingTop="10dp" >
+            app:adSize="BANNER"
+            app:adUnitId="ca-app-pub-9579903615710521/7532020690" >
 
-            <Button
-                android:id="@+id/park"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:drawableTop="@drawable/marker"
-                android:text="@string/park" />
-            
-		    <Button
-		        android:id="@+id/find"
-		        style="?android:attr/buttonBarButtonStyle"
-		        android:layout_width="0dp"
-		        android:layout_height="wrap_content"
-		        android:layout_weight="1"
-		        android:drawableTop="@drawable/compass"
-		        android:text="@string/find" />
-		    
-		    <Button
-		        android:id="@+id/reset"
-		        style="?android:attr/buttonBarButtonStyle"
-		        android:layout_width="0dp"
-		        android:layout_height="wrap_content"
-		        android:layout_weight="1"
-		        android:drawableTop="@drawable/delete"
-		        android:text="@string/reset" />
+    </com.google.android.gms.ads.AdView>
 
-		</LinearLayout>
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="0dip"
+        android:layout_gravity="fill"
+        android:layout_weight="0.75" />
+
     </LinearLayout>
+    
+
+    <LinearLayout
+        android:id="@+id/buttonArea"
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="?android:attr/listDivider"
+        android:dividerPadding="12dp"
+        android:gravity="bottom|right"
+        android:orientation="horizontal"
+        android:paddingBottom="0dp"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:paddingTop="10dp" >
+
+        <Button
+            android:id="@+id/park"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/marker"
+            android:text="@string/park" />
+
+        <Button
+            android:id="@+id/find"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/compass"
+            android:text="@string/find" />
+
+        <Button
+            android:id="@+id/reset"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/delete"
+            android:text="@string/reset" />
+    </LinearLayout>
+
+</LinearLayout>
