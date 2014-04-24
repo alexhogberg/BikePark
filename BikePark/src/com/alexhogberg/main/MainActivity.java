@@ -99,6 +99,11 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
+	
+	@Override
+	public void onBackPressed() {
+	    
+	}
 
 	private void loadSettings() {
 		HashMap<String, Object> prefs = getSavedPrefs();
@@ -216,8 +221,11 @@ public class MainActivity extends Activity {
 	protected void clearMap() {
 		mMap.clear();
 		currentTargetMarker = null;
+		currentPositionMarker = null;
+		mapLine = null;
 		mlocListener.setCurrentTarget(null);
 		mlocListener.setCurrentPosition(null);
+		mlocListener.clear();
 		removeSavedPrefs();
 	}
 

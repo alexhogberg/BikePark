@@ -51,6 +51,10 @@ public class GPSListener implements LocationListener {
 		return position;
 	}
 	
+	public void clear() {
+		map.clear();
+	}
+	
 	@Override
 	public void onLocationChanged(Location loc) {
 		if (mapLine != null)
