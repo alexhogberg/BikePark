@@ -37,7 +37,7 @@
              android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBSalMLxqE3vGuWjr0TxoEHk4jvHaN9rXs" />
+            android:value="AIzaSyCZShysVtF_waAYqWxQCmbuYqfvPWfd56g" />
         <meta-data android:name="com.google.android.gms.version"
              android:value="@integer/google_play_services_version" />
         <activity android:name="com.alexhogberg.gps.GPSListener"></activity>
