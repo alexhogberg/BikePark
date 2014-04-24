@@ -3,12 +3,16 @@ package com.alexhogberg.main;
 import java.util.Date;
 import java.util.HashMap;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.alexhogberg.ads.Banner;
 import com.alexhogberg.android.R;
 import com.alexhogberg.gps.GPSListener;
 import com.alexhogberg.map.MapHelper;
@@ -24,6 +28,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -45,6 +50,19 @@ public class MainActivity extends Activity {
 		//Load the view
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		final LinearLayout lnrMain = (LinearLayout) findViewById(R.id.adLayout);
+		runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AdView adView = new AdView(MainActivity.this);
+                adView.setAdUnitId("ca-app-pub-9579903615710521/7532020690");
+                adView.setAdSize(AdSize.BANNER);
+                AdRequest.Builder builder = new AdRequest.Builder();
+                builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+                adView.loadAd(builder.build());
+                lnrMain.addView(adView);
+            }
+        });
 		
 		//Load the current GoogleMap from the fragment
 		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))

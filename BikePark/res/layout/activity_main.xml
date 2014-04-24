@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout1"
@@ -17,33 +18,26 @@
 
 
     <LinearLayout
+        android:id="@+id/adLayout"
         android:layout_width="match_parent"
-        android:layout_height="460dp"
+        android:layout_height="50dp"
         android:orientation="vertical" >
-
-        <com.google.android.gms.ads.AdView
-            xmlns:ads="http://schemas.android.com/apk/res-auto"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/adView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:adSize="BANNER"
-            app:adUnitId="ca-app-pub-9579903615710521/7532020690" >
-
-    </com.google.android.gms.ads.AdView>
-
-    <fragment
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/mapLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.MapFragment"
         android:layout_width="wrap_content"
         android:layout_height="0dip"
         android:layout_gravity="fill"
         android:layout_weight="0.75" />
-
-    </LinearLayout>
-    
-
-    <LinearLayout
+        
+        <LinearLayout
         android:id="@+id/buttonArea"
         style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
@@ -84,5 +78,9 @@
             android:drawableTop="@drawable/delete"
             android:text="@string/reset" />
     </LinearLayout>
+    </LinearLayout>
+    
+
+    
 
 </LinearLayout>
