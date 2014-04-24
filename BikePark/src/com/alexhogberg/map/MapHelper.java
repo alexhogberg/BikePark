@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import android.graphics.Color;
+import android.location.Location;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -80,6 +81,15 @@ public class MapHelper {
 	 */
 	public void zoomTo(Marker position) {
 		CameraUpdate center = CameraUpdateFactory.newLatLng(position.getPosition());
+		CameraUpdate zoom = CameraUpdateFactory.zoomTo(ZOOM_LEVEL);
+		
+		currentMap.moveCamera(center);
+		currentMap.animateCamera(zoom);
+	}
+	
+	public void zoom(Location loc) {
+		LatLng position = new LatLng(loc.getLatitude(), loc.getLongitude());
+		CameraUpdate center = CameraUpdateFactory.newLatLng(position);
 		CameraUpdate zoom = CameraUpdateFactory.zoomTo(ZOOM_LEVEL);
 		
 		currentMap.moveCamera(center);

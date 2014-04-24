@@ -12,7 +12,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
-import com.alexhogberg.ads.Banner;
 import com.alexhogberg.android.R;
 import com.alexhogberg.gps.GPSListener;
 import com.alexhogberg.map.MapHelper;
@@ -78,6 +77,8 @@ public class MainActivity extends Activity {
 		mlocListener = new GPSListener(mMap, currentPositionMarker, currentTargetMarker, this);
 		mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
 				mlocListener);
+		
+		initialMapZoom();
 		
 		// If the user has closed the app with a present parking, load these
 		// settings
@@ -246,6 +247,13 @@ public class MainActivity extends Activity {
 		mlocListener.setCurrentPosition(null);
 		mlocListener.clear();
 		removeSavedPrefs();
+	}
+	
+	private void initialMapZoom() {
+		Location loc = mlocManager
+				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		if(loc != null)
+			mH.zoom(loc);
 	}
 
 	/**
